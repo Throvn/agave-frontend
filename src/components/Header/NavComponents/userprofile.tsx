@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import {
   Text,
   Center,
@@ -19,15 +19,24 @@ export const UserProfile: React.FC<{}> = () => {
 
   // Address button functions
   const address: string | undefined = useAppWeb3().account ?? undefined;
+  const { library } = useAppWeb3();
+  const [domainName, setDomainName] = React.useState<string | null>(null);
+  if (address && library?.network) {
+    library.network.ensAddress = "0x4f132A7e39B1D717B39C789eB9EC1e790092042B";
+    library.lookupAddress(address).then(setDomainName).catch(console.error);
+  }
+
   const addressPretty = useMemo(
     () =>
-      address
-        ? `${address.substring(0, 4)}...${address.substring(
+      domainName ?
+        domainName :
+        address
+          ? `${address.substring(0, 4)}...${address.substring(
             address.length - 4,
             address.length
           )}`
-        : "Not Connected",
-    [address]
+          : "Not Connected",
+    [address, domainName]
   );
 
   // Agve button functions
